@@ -2,41 +2,35 @@ import React, { Component } from 'react'
 import './App.css';
 import Homepage from "./pages/homepage/Homepage";
 import Shop from "./pages/shop/Shop"
-import {Switch,Route,} from "react-router-dom"
+import {Switch,Route,Redirect} from "react-router-dom"
+import {connect} from "react-redux"
+import {setUser} from "./redux/user/User.action"
 import Header from "./components/header/Header"
 import SignInSignUp from "./pages/sign-in-and-sign-up/SignInSignUp"
 import {auth,createUserProfileDocument} from "./firebase/Firebase.utils" 
 
 
-export default class App extends Component {
+class App extends Component {
   
-  constructor(){
-    super();
-    this.state = {
-      User : null
-    }
-  }
-
-
+  
 unSubscribeFromAuth = null
 
 componentDidMount(){
+  const {setUser} = this.props;
   this.unSubscribeFromAuth = auth.onAuthStateChanged( async userAuth=>{
 
     if(userAuth){
       const userRef = await createUserProfileDocument(userAuth);
 
       userRef.onSnapshot(snapShot=>{
-        this.setState({
-          User : {
+          setUser({
             id : snapShot.id,
             ...snapShot.data()
-          }
-        })
-      })
+          });
+      });
      
     }
-    this.setState({User:userAuth}) // if user has logged out , setting it to null.
+    setUser(userAuth) // if user has logged out , setting it to null.
   });
 }
 
@@ -46,46 +40,32 @@ componentWillUnmount(){
 
 
   render() {
+    console.log(this.props)
     return (
       <div >
-      <Header currentUser={this.state.User} />
+      <Header />
       <Switch>
         <Route exact path="/" component={Homepage} />
         <Route  path="/shop" component={Shop} />
-        <Route path="/signin" component={SignInSignUp}  />
+        <Route exact path="/signin" render={()=>this.props.User?(<Redirect to="/" />):(<SignInSignUp />)}  />
       </Switch>
        </div>
     );
   }
 }
 
-// import React,{useState,useEffect} from 'react'
-
-// function App() {
-
-//   const [User, setUser] = useState(null)
-
-// var unSubscribeFromAuth = null
-  
-//   useEffect(() => {
-//     unSubscribeFromAuth = auth.onAuthStateChanged(user=>{setUser(user)
-//     console.log(user);
-//   }); 
-//   }, [])
+const mapStateToProps = ({user}) => ({
+  User : user.User
+})
 
 
+const mapDispatchToProps = dispatch =>({
+  setUser : user => dispatch(setUser(user)) // dispatch() function -> whatever object is passed will be passed as action object to every reducer 
+})
 
-//   return (
-//     <div>
-//       <Header currentUser={User} />
-//       <Switch>
-//         <Route exact path="/" component={Homepage} />
-//         <Route  path="/shop" component={Shop} />
-//         <Route path="/signin" component={SignInSignUp}  />
-//       </Switch>
-//     </div>
-//   )
-// }
 
-// export default App
+export default connect(mapStateToProps,mapDispatchToProps)(App)
 
+
+// connect arguements are mapStateToProps,mapDispatchToProps 
+// if any of this argument is not required we pass in null
