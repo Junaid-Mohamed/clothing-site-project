@@ -1,13 +1,23 @@
 import React, { Component } from 'react'
+import {Switch,Route,Redirect} from "react-router-dom"
+
+import {connect} from "react-redux"
+import {createStructuredSelector} from "reselect"
 import './App.css';
+
+import CheckoutPage from "./pages/checkout/CheckoutPage"
 import Homepage from "./pages/homepage/Homepage";
 import Shop from "./pages/shop/Shop"
-import {Switch,Route,Redirect} from "react-router-dom"
-import {connect} from "react-redux"
-import {setUser} from "./redux/user/User.action"
-import Header from "./components/header/Header"
 import SignInSignUp from "./pages/sign-in-and-sign-up/SignInSignUp"
+
+import {selectUser} from "./redux/user/User.selectors"
+import {setUser} from "./redux/user/User.action"
+
+import Header from "./components/header/Header"
+
 import {auth,createUserProfileDocument} from "./firebase/Firebase.utils" 
+
+
 
 
 class App extends Component {
@@ -47,6 +57,7 @@ componentWillUnmount(){
       <Switch>
         <Route exact path="/" component={Homepage} />
         <Route  path="/shop" component={Shop} />
+        <Route exact path="/checkout" component={CheckoutPage} />
         <Route exact path="/signin" render={()=>this.props.User?(<Redirect to="/" />):(<SignInSignUp />)}  />
       </Switch>
        </div>
@@ -54,8 +65,8 @@ componentWillUnmount(){
   }
 }
 
-const mapStateToProps = ({user}) => ({
-  User : user.User
+const mapStateToProps =createStructuredSelector ({
+  User : selectUser
 })
 
 
