@@ -4,7 +4,11 @@ import {persistStore} from "redux-persist"
 
 import rootReducer from "./Root.reducer";
 
-const middlewares = [logger]; // stote is expecting from redux is array of middleware
+const middlewares = []; // stote is expecting from redux is array of middleware
+
+if(process.env.NODE_ENV === "development" ){
+    middlewares.push(logger); // if it's in development, redux log's wont be logged
+}
 
 export const store = createStore(rootReducer,applyMiddleware(...middlewares)) //any number of middlewares can be applied to applymiddleware function
 
