@@ -35,7 +35,7 @@ function CheckoutPage({ cartItems, total }) {
       <div className="test-warning">
         *Please use the following test card for payment*
         <br/>
-        4242 4242 4242 - Exp: 01/21 - CVV: 123
+        4242 4242 4242 4242 - Exp: 01/21 - CVV: 123
       </div>
       <div className="total">
       
